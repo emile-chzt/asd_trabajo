@@ -1,0 +1,15 @@
+{
+  "name": "aplicacion_web_profesional",
+  "version":"1.0.0",
+  "main": "server.js",
+  "dependencies": {
+    "express": "~4.9.1",
+    "body-parser": "~1.9.3",
+    "express-myconnection": "*",
+    "mysql": "*",
+    "jsonwebtoken": "^1.2.0",
+    "connect-multiparty": "~1.2.5",
+    "node-adodb":"~2.0.3"
+
+  }
+}

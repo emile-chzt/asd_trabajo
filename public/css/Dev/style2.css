@@ -1,0 +1,26 @@
+
+#rightContainer{
+	width:25%;
+	float:right;
+}
+  
+h1{
+	margin-left:1%;
+    color: rgb(205, 24, 48);
+}
+#imageContainer2{
+    width:60%;
+    margin: 0 auto;
+    float: right;
+}
+h3{
+
+	color: black;
+	font-weight: bold;
+}
+#secondCol{
+	width:20%;
+	vertical-align: top;
+    margin-right: 5%;
+    float: right;
+}

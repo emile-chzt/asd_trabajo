@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+ <head>
+	<meta charset="UTF-8">
+
+
+	<title>Acceso profesionales</title>
+
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/Core/bootstrap.min.css">
+  <link rel="stylesheet" href="css/Core/font-awesome.css">
+  <link rel="stylesheet" href="css/Core/font-awesome.min.css">
+  <link rel="stylesheet" href="css/Core/normalize.css">
+  <link rel="stylesheet" href="css/Dev/style.css">
+  <link rel="stylesheet" href="css/Dev/style2.css">
+
+	<script src="js/Core/openjpeg.js"></script>
+	<script src="js/Core/angular.min.js"></script>
+	<script src="js/Core/NgDicomViewer-mini.js"></script>
+	<script src="js/Core/ui-bootstrap-tpls-0.14.3.min.js"></script>
+
+	<script src="js/Dev/app.js"></script>
+  <script src="js/Dev/Services/doctor.js"></script>
+
+ </head>
+ 
+ <body ng-app="LabApp" ng-controller="mainController">
+  <h1>Escenario Profesional</h1>
+
+  <div  id="doctorSelect" class="form-group" ng-show="patientData==0">
+    Seleccionar Médico:<select name="Doctor" ng-model="selectedDoctor" class="form-control" ng-options="opt.name for opt in doctorList.Doctors" ng-change="doctorVisits(selectedDoctor.id);" required></select>
+  </div>
+
+  <div ng-show="selectedDoctor">
+
+    <div id="associatedVisits" ng-show="patientData==0">
+        <table class="table table-bordered">
+            <tr id="headerTable">
+                <td>
+                Paciente
+                </td>
+                <td>
+                Fecha de la visita
+                </td>
+                <td>
+                Diagnóstico
+                </td>
+            </tr>
+            <tr ng-repeat="visit in visits">
+                <td>
+                {{visit.NOMBRE}}
+                </td>
+                <td>
+                {{visit.FECHA_VIS| date:'dd-MM-yyyy'}}
+                </td>
+                <td>
+                {{visit.DIAGNOSTICO}}
+                </td>
+                <td>
+                    <span class="fa-stack fa-lg" ng-click="selectedPatient(visit.PAC_ID);">
+                      <i class="fa fa-circle fa-stack-2x text-success"></i>
+                      <i class="fa fa-eye fa-stack-1x fa-inverse"></i>
+                    </span>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div ng-show="patientData==1">
+
+      <a class="btn btn-danger" id="comeBackButton" ng-click="comeBack();" href="#">
+        <i class="fa fa-arrow-left fa-lg"></i> Volver</a>
+      <div class ="box" id="rightContainer">
+        
+        
+      
+        <h3>Datos personales del paciente</h3>
+        <div id="personalData">
+          <span id="label">Nombre:</span> {{patient.NOMBRE}}<br>
+          <span id="label">Fecha de nacimiento:</span> {{patient.FECHA_NAC | date:'dd-MM-yyyy'}}<br>
+          <span id="label">Dirección:</span> {{patient.DIRECCION}}<br>
+          <span id="label">Teléfono:</span> {{patient.TELEFONO}}
+        </div>
+      </div>
+      
+
+        <h3>Pruebas médicas</h3>
+        <div id="studieData" ng-show="studieData.StudyNumber">
+          <h4>Estudio Nº {{studieData.StudyNumber}}</h4>
+          <span id="label">Fecha:</span> {{studieData.StudyDate| date:'dd-MM-yyyy'}}<br>
+          <span id="label">Modalidad:</span> {{studieData.Modality}}<br>
+          <span id="label">Descripción:</span> {{studieData.StudyDescription}}
+
+          <div ng-show="showImage==0;">
+            <table id="seriesTable" class="table table-bordered">
+              <tr id="headerTable">
+                <td>
+                  Serie Nº
+                </td>
+                <td>
+                  Fecha
+                </td>
+                <td>
+                  Descripción
+                </td>
+                <td>
+                  Imagen
+                </td>
+              </tr>
+              <tr ng-repeat="serie in seriesData">
+                <td>
+                  {{serie.SeriesNumber}}
+                </td>
+                <td>
+                  {{serie.SeriesDate | date:'dd-MM-yyyy'}} {{serie.SeriesTime | date:'hh:mm:ss'}}
+                </td>
+                <td>
+                  {{serie.SeriesDescription}}
+                </td>
+                <td>
+                  <a href="" ng-click="selectImage(serie.ObjectFile);">{{serie.ObjectFile}}</a>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div id="studieData" ng-show="!studieData.StudyNumber">
+          No hay datos para este paciente
+        </div>
+      </div>
+
+    
+     <div id="imageContainer" ng-show="showImage==1;">
+
+      <table>
+        <tr>
+          <td id="firstCol">
+
+            <h4 id="colTitle">Archivo:</h4>
+            <input class = "optionbtn" type="text" id="urlsList" value="{{urlData}}" disabled="disabled"/>
+            <input class = "optionbtn" type="button" value="Abrir Imagen" id="openurlbtn" ng-click="showTable();" /><br><br>
+
+            <h4 id="colTitle">Herramientas:</h4><br><br>
+
+            <input type="button" class="toolbtn" ng-click="SelectedMouseTool='circle'" ng-class="SelectedMouseTool=='circle' ? 'toolmbtnclicked':''" style=" background-image:url('Icons/cir.png');" title="circle" />
+            <input type="button" class="toolbtn" ng-click="SelectedMouseTool='line'" ng-class="SelectedMouseTool=='line' ? 'toolmbtnclicked':''" style=" background-image:url('Icons/line.png');" title="line" />
+            <input type="button" class="toolbtn" ng-click="SelectedMouseTool='rectangular'" ng-class="SelectedMouseTool=='rectangular' ? 'toolmbtnclicked':''" style=" background-image:url('Icons/rect.png');"  title="rectangular" />
+            <input type="button" class="toolbtn" ng-click="SelectedMouseTool='ellipse'" ng-class="SelectedMouseTool=='ellipse' ? 'toolmbtnclicked':''" style=" background-image:url('Icons/ele.png');"  title="ellipse" />
+            <input type="button" class="toolbtn" ng-click="SelectedMouseTool='WindowLevel'" ng-class="SelectedMouseTool=='WindowLevel' ? 'toolmbtnclicked':''" style=" background-image:url('Icons/wl.png');"  title="WindowLevel" />
+            <input type="button" class="toolbtn" ng-click="SelectedButtonTool='plain'" title="plain" style=" background-image:url('Icons/plane.png');"  />
+            <input type="button" class="toolbtn" ng-click="SelectedButtonTool='invplain'" title="invplain" style=" background-image:url('Icons/Ivt.png');"  />
+            <input type="button" class="toolbtn" ng-click="SelectedButtonTool='rainbow'" title="rainbow" style=" background-image:url('Icons/rbow.png');" />
+            <input type="button" class="toolbtn" ng-click="SelectedButtonTool='hot'" title="hot"  style=" background-image:url('Icons/hot.png');"  />
+            <input type="button" class="toolbtn" ng-click="SelectedButtonTool='test'" title="test" style=" background-image:url('Icons/test.png');" />
+            <input type="button" class="toolbtn" ng-click="SelectedButtonTool='sharpen'" title="sharpen" style=" background-image:url('Icons/snr.png');"  />
+            <input type="button" class="toolbtn" ng-click="SelectedButtonTool='sobel'" title="sobel" style=" background-image:url('Icons/ed.png');" />
+            <input type="button" class="toolbtn" ng-click="SelectedButtonTool='threshold'" title="threshold" ng-class="SelectedButtonTool=='threshold' ? 'toolbtnclicked':''" style=" background-image:url('Icons/thold.png');" />
+            <input type="button" class="toolbtn" ng-click="SelectedButtonTool='reset image'" title="reset image" style=" background-image:url('Icons/rset.png');" />
+            <input type="button" class="toolbtn" ng-click="SelectedButtonTool='clearAnnotation'" title="clearAnnotation" style=" background-image:url('Icons/clrann.png');" />
+            <input type="button" class="toolbtn" ng-click="closeImage();SelectedButtonTool='clear';" title="clear" style=" background-image:url('Icons/clr.png');"   />
+          </td>
+
+          <td id="secondCol">
+            <div>Titulo de la imagen</div>
+            <dicomviewer class ="dicom" id="dicom" fileutilityid ="fileinput"  urllistid = "urlsList" urlopenbtnid ="openurlbtn"></dicomviewer>
+          </td>
+
+          
+            
+                      
+          </td>
+        </tr>
+      </table>
+    
+    </div>          
+    
+
+  </div>
+
+
+ 
+ </body>
+
+</html>
+
+
